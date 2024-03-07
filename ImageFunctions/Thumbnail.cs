@@ -107,8 +107,6 @@ namespace ImageFunctions
                         var blobServiceClient = new BlobServiceClient(BLOB_STORAGE_CONNECTION_STRING);
                         var blobContainerClient = blobServiceClient.GetBlobContainerClient(thumbContainerName);
                         var blobName = GetBlobNameFromUrl(createdEvent.Url);
-
-                        using (var output = new MemoryStream())
                       
                             var contenttype = GetContentType(extension);
 
