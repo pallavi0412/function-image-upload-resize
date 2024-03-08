@@ -123,12 +123,6 @@ namespace ImageFunctions
                             
                                 image.Mutate(x => x.Resize(thumbnailWidth, height));
                             
-                                // Adjust the JPEG compression level (quality)
-                                if (encoder is PngEncoder pngEncoder)
-                                {
-                                    pngEncoder.Quality = 80; // Set the desired compression level (0 to 100)
-                                }
-                            
                                 image.Save(output, encoder);
                                 output.Position = 0;
                             
