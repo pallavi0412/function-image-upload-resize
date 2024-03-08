@@ -70,6 +70,22 @@ namespace ImageFunctions
             return encoder;
         }
 
+        // Determine content type based on file extension
+            private static string GetContentType(string extension)
+            {
+                switch (extension.ToLower())
+                {
+                    case "png":
+                        return "image/png";
+                    case "jpg":
+                    case "jpeg":
+                        return "image/jpeg";
+                    // Add more cases for other supported formats if needed
+                    default:
+                        return "application/octet-stream"; // Default to octet-stream for unknown types
+                }
+            }
+
         [FunctionName("Thumbnail")]
         public static async Task Run(
             [EventGridTrigger]EventGridEvent eventGridEvent,
@@ -93,15 +109,31 @@ namespace ImageFunctions
                         var blobName = GetBlobNameFromUrl(createdEvent.Url);
 
                         using (var output = new MemoryStream())
-                        using (Image<Rgba32> image = Image.Load(input))
-                        {
-                            var divisor = image.Width / thumbnailWidth;
-                            var height = Convert.ToInt32(Math.Round((decimal)(image.Height / divisor)));
+                      
+                            var contenttype = GetContentType(extension);
 
-                            image.Mutate(x => x.Resize(thumbnailWidth, height));
-                            image.Save(output, encoder);
-                            output.Position = 0;
-                            await blobContainerClient.UploadBlobAsync(blobName, output);
+                            var uploadOptions = new BlobUploadOptions
+                            {
+                                HttpHeaders = new BlobHttpHeaders { ContentType = contenttype }
+                            };
+                            using (Image<Rgba32> image = Image.Load(input))
+                            {
+                                var divisor = image.Width / thumbnailWidth;
+                                var height = Convert.ToInt32(Math.Round((decimal)(image.Height / divisor)));
+                            
+                                image.Mutate(x => x.Resize(thumbnailWidth, height));
+                            
+                                // Adjust the JPEG compression level (quality)
+                                if (encoder is PngEncoder pngEncoder)
+                                {
+                                    pngEncoder.Quality = 80; // Set the desired compression level (0 to 100)
+                                }
+                            
+                                image.Save(output, encoder);
+                                output.Position = 0;
+                            
+                                                            
+                            await blobContainerClient.UploadBlobAsync(blobName, output, uploadOptions);
                         }
                     }
                     else
