@@ -123,15 +123,7 @@ namespace ImageFunctions
                             {
                                 var divisor = image.Width / thumbnailWidth;
                                 var height = Convert.ToInt32(Math.Round((decimal)(image.Height / divisor)));
-                            
-                                image.Mutate(x => x.Resize(thumbnailWidth, height));
-                            
-                                // Adjust the JPEG compression level (quality)
-                                if (encoder is PngEncoder pngEncoder)
-                                {
-                                    pngEncoder.Quality = 30; // Set the desired compression level (0 to 100)
-                                }
-                            
+                                image.Mutate(x => x.Resize(thumbnailWidth, height));                           
                                 image.Save(output, encoder);
                                 output.Position = 0;                                                            
                                 await blobContainerClient.UploadBlobAsync(blobName, output, uploadOptions);
