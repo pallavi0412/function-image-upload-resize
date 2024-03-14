@@ -9,10 +9,6 @@
 
 using Azure.Storage.Blobs;
 using Microsoft.Azure.EventGrid.Models;
-using Azure.Storage.Blobs.Models;
-// using Azure.Storage.Blobs.Models.BlobHttpHeaders;
-using Azure.Storage.Blobs.BlobUploadOptions;
-using Azure.Storage.Blobs.BlobHttpHeaders;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
@@ -74,22 +70,6 @@ namespace ImageFunctions
             return encoder;
         }
 
-        // Determine content type based on file extension
-            private static string GetContentType(string extension)
-            {
-                switch (extension.ToLower())
-                {
-                    case "png":
-                        return "image/png";
-                    case "jpg":
-                    case "jpeg":
-                        return "image/jpeg";
-                    // Add more cases for other supported formats if needed
-                    default:
-                        return "application/octet-stream"; // Default to octet-stream for unknown types
-                }
-            }
-
         [FunctionName("Thumbnail")]
         public static async Task Run(
             [EventGridTrigger]EventGridEvent eventGridEvent,
@@ -112,23 +92,16 @@ namespace ImageFunctions
                         var blobContainerClient = blobServiceClient.GetBlobContainerClient(thumbContainerName);
                         var blobName = GetBlobNameFromUrl(createdEvent.Url);
 
-                        
-                        var contenttype = GetContentType(extension);
-
-                        var uploadOptions = new BlobUploadOptions
-                        {
-                            HttpHeaders = new BlobHttpHeaders { ContentType = contenttype }
-                        };
-
                         using (var output = new MemoryStream())
                         using (Image<Rgba32> image = Image.Load(input))
-                            {
-                                var divisor = image.Width / thumbnailWidth;
-                                var height = Convert.ToInt32(Math.Round((decimal)(image.Height / divisor)));
-                                image.Mutate(x => x.Resize(thumbnailWidth, height));                           
-                                image.Save(output, encoder);
-                                output.Position = 0;                                                            
-                                await blobContainerClient.UploadBlobAsync(blobName, output, uploadOptions);
+                        {
+                            var divisor = image.Width / thumbnailWidth;
+                            var height = Convert.ToInt32(Math.Round((decimal)(image.Height / divisor)));
+
+                            image.Mutate(x => x.Resize(thumbnailWidth, height));
+                            image.Save(output, encoder);
+                            output.Position = 0;
+                            await blobContainerClient.UploadBlobAsync(blobName, output);
                         }
                     }
                     else
