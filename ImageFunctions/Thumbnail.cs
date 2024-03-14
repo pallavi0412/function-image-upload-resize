@@ -8,8 +8,6 @@
 //   https://{ID}.ngrok.io/runtime/webhooks/EventGrid?functionName=Thumbnail
 
 using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.BlobUploadOptions;
-using Azure.Storage.Blobs.BlobHttpHeaders;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
@@ -72,22 +70,6 @@ namespace ImageFunctions
             return encoder;
         }
 
-        // Determine content type based on file extension
-            private static string GetContentType(string extension)
-            {
-                switch (extension.ToLower())
-                {
-                    case "png":
-                        return "image/png";
-                    case "jpg":
-                    case "jpeg":
-                        return "image/jpeg";
-                    // Add more cases for other supported formats if needed
-                    default:
-                        return "application/octet-stream"; // Default to octet-stream for unknown types
-                }
-            }
-
         [FunctionName("Thumbnail")]
         public static async Task Run(
             [EventGridTrigger]EventGridEvent eventGridEvent,
@@ -101,11 +83,6 @@ namespace ImageFunctions
                     var createdEvent = ((JObject)eventGridEvent.Data).ToObject<StorageBlobCreatedEventData>();
                     var extension = Path.GetExtension(createdEvent.Url);
                     var encoder = GetEncoder(extension);
-                    var contenttype = GetContentType(extension);
-                        var uploadOptions = new BlobUploadOptions
-                        {
-                            HttpHeaders = new BlobHttpHeaders { ContentType = contenttype }
-                        };
 
                     if (encoder != null)
                     {
@@ -124,8 +101,7 @@ namespace ImageFunctions
                             image.Mutate(x => x.Resize(thumbnailWidth, height));
                             image.Save(output, encoder);
                             output.Position = 0;
-                            //await blobContainerClient.UploadBlobAsync(blobName, output);
-                            await blobContainerClient.UploadBlobAsync(blobName, output, uploadOptions);
+                            await blobContainerClient.UploadBlobAsync(blobName, output);
                         }
                     }
                     else
