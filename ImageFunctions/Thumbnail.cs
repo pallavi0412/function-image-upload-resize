@@ -9,8 +9,8 @@
 
 using Azure.Storage.Blobs;
 using Microsoft.Azure.EventGrid.Models;
-using Azure.Storage.Blobs.Models.BlobUploadOptions;
-using Azure.Storage.Blobs.Models.BlobHttpHeaders;
+using Azure.Storage.Blobs.Models;
+// using Azure.Storage.Blobs.Models.BlobHttpHeaders;
 // using Azure.Storage.Blobs.BlobUploadOptions;
 // using Azure.Storage.Blobs.BlobHttpHeaders;
 using Microsoft.Azure.WebJobs;
