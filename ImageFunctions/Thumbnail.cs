@@ -96,6 +96,7 @@ namespace ImageFunctions
                         var blobName = GetBlobNameFromUrl(createdEvent.Url);
 
                         using (var output = new MemoryStream())
+                        using (var output1 = new MemoryStream())
                         using (Image<Rgba32> image = Image.Load(input))
                         {
                             var divisor = image.Width / thumbnailWidth;
@@ -110,9 +111,9 @@ namespace ImageFunctions
                             var heightM = Convert.ToInt32(Math.Round((decimal)(image.Height / divisorM)));
 
                             image.Mutate(x => x.Resize(thumbnailWidthM, heightM));
-                            image.Save(output, encoder);
-                            output.Position = 0;
-                            await blobContainerClientM.UploadBlobAsync(blobName, output);
+                            image.Save(output1, encoder);
+                            output1.Position = 0;
+                            await blobContainerClientM.UploadBlobAsync(blobName, output1);
                         }
                     }
                     else
