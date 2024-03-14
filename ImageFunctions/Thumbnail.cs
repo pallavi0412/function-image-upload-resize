@@ -8,6 +8,8 @@
 //   https://{ID}.ngrok.io/runtime/webhooks/EventGrid?functionName=Thumbnail
 
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.BlobUploadOptions;
+using Azure.Storage.Blobs.BlobHttpHeaders;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
