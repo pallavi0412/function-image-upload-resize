@@ -86,7 +86,7 @@ namespace ImageFunctions
 
                     if (encoder != null)
                     {
-                        var thumbnailWidth = Convert.ToInt32(Environment.GetEnvironmentVariable("THUMBNAIL_WIDTH"));
+                        var thumbnailWidth = Convert.ToInt32("600");
                         var thumbContainerName = Environment.GetEnvironmentVariable("THUMBNAIL_CONTAINER_NAME");
                         var thumbnailWidthM = Convert.ToInt32(Environment.GetEnvironmentVariable("THUMBNAIL_WIDTH_MEDIUM"));
                         var thumbContainerNameM = Environment.GetEnvironmentVariable("THUMBNAIL_CONTAINER_NAME_MEDIUM");
